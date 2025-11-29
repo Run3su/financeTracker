@@ -56,7 +56,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onAddExpense, onAddIncome, 
   // Calculate personal spending totals directly from the transaction list
   const personalSpendingMap = data.recentTransactions
     .filter(tx => tx.type === 'expense' && personalCategoryNames.includes(tx.category))
-    .reduce((acc, tx) => {
+    // FIX: Add explicit type for the accumulator to prevent it from being inferred as `any` or `unknown`.
+    // This ensures `personalSpendingMap` and derived variables have the correct types, resolving downstream errors.
+    .reduce((acc: { [key: string]: { name: string; amount: number; color: string } }, tx) => {
       if (!acc[tx.category]) {
         acc[tx.category] = {
           name: tx.category,

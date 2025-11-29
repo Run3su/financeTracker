@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import EditProfileModal from './components/EditProfileModal';
 import WalletModal from './components/WalletModal';
@@ -6,13 +6,29 @@ import StatsModal from './components/StatsModal';
 import { Home, PieChart, Bell, User } from 'lucide-react';
 import { INITIAL_STATE } from './constants';
 import { FinancialData, Transaction } from './types';
+import { saveState, loadState } from './services/storageService';
 
 const App: React.FC = () => {
-  const [userName, setUserName] = useState("Mwape Katongo");
-  const [financialData, setFinancialData] = useState<FinancialData>(INITIAL_STATE);
+  // Lazy initialize state from localStorage or use defaults
+  const [userName, setUserName] = useState<string>(() => {
+    const savedState = loadState();
+    return savedState ? savedState.userName : "Mwape Katongo";
+  });
+  
+  const [financialData, setFinancialData] = useState<FinancialData>(() => {
+    const savedState = loadState();
+    return savedState ? savedState.financialData : INITIAL_STATE;
+  });
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
+
+  // Effect to save state to localStorage whenever it changes
+  useEffect(() => {
+    saveState(userName, financialData);
+  }, [userName, financialData]);
+
 
   const handleUpdateProfile = (name: string, salary: number) => {
     setUserName(name);

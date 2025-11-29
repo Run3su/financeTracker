@@ -1,10 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { FinancialData } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getFinancialInsights = async (data: FinancialData): Promise<string> => {
   try {
+    // Initialize the AI client here, only when the function is called.
+    // This prevents a crash on load if the API key environment variable isn't set.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
     const prompt = `
       Analyze the following financial data for a user in Zambia (Currency: Kwacha).
       
@@ -31,6 +33,10 @@ export const getFinancialInsights = async (data: FinancialData): Promise<string>
     return response.text || "Unable to generate insights at this time.";
   } catch (error) {
     console.error("Error fetching Gemini insights:", error);
-    return "AI insights are currently unavailable. Please check your connection.";
+    // Provide a more user-friendly error message
+    if (error instanceof Error && error.message.includes('process is not defined')) {
+        return "AI insights are unavailable. The API key is not configured for this deployment."
+    }
+    return "AI insights are currently unavailable. Please check your connection or API key setup.";
   }
 };
