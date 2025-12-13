@@ -1,6 +1,6 @@
 import { FinancialData } from '../types';
 
-const STORAGE_KEY = 'financeTrackerData';
+const APP_STATE_KEY = 'financeTrackerData';
 
 interface AppState {
   userName: string;
@@ -16,7 +16,7 @@ export const saveState = (userName: string, financialData: FinancialData): void 
   try {
     const appState: AppState = { userName, financialData };
     const serializedState = JSON.stringify(appState);
-    localStorage.setItem(STORAGE_KEY, serializedState);
+    localStorage.setItem(APP_STATE_KEY, serializedState);
   } catch (error) {
     console.error("Could not save state to localStorage", error);
   }
@@ -28,7 +28,7 @@ export const saveState = (userName: string, financialData: FinancialData): void 
  */
 export const loadState = (): AppState | null => {
   try {
-    const serializedState = localStorage.getItem(STORAGE_KEY);
+    const serializedState = localStorage.getItem(APP_STATE_KEY);
     if (serializedState === null) {
       return null;
     }

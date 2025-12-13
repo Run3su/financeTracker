@@ -27,3 +27,7 @@ export interface FinancialData {
   recentTransactions: Transaction[];
   spendingCategories: SpendingCategory[];
 }
+
+export interface ExchangeRates {
+  [key: string]: number;
+}

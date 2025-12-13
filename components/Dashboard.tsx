@@ -12,7 +12,8 @@ import {
   X
 } from 'lucide-react';
 import { formatCurrency } from '../constants';
-import { FinancialData } from '../types';
+// FIX: Import `SpendingCategory` to use as an explicit type for the spending map.
+import { FinancialData, SpendingCategory } from '../types';
 import SpendingChart from './SpendingChart';
 import AddExpensePanel from './AddExpensePanel';
 import AddIncomePanel from './AddIncomePanel';
@@ -56,9 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onAddExpense, onAddIncome, 
   // Calculate personal spending totals directly from the transaction list
   const personalSpendingMap = data.recentTransactions
     .filter(tx => tx.type === 'expense' && personalCategoryNames.includes(tx.category))
-    // FIX: Add explicit type for the accumulator to prevent it from being inferred as `any` or `unknown`.
-    // This ensures `personalSpendingMap` and derived variables have the correct types, resolving downstream errors.
-    .reduce((acc: { [key: string]: { name: string; amount: number; color: string } }, tx) => {
+    .reduce((acc, tx) => {
       if (!acc[tx.category]) {
         acc[tx.category] = {
           name: tx.category,
@@ -68,7 +67,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onAddExpense, onAddIncome, 
       }
       acc[tx.category].amount += tx.amount;
       return acc;
-    }, {} as { [key: string]: { name: string; amount: number; color: string } });
+    }, {} as Record<string, SpendingCategory>);
 
   const personalSpendingData = Object.values(personalSpendingMap);
   const totalPersonalSpending = personalSpendingData.reduce((acc, curr) => acc + curr.amount, 0);
